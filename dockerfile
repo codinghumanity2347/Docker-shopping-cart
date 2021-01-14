@@ -18,19 +18,34 @@ RUN  mvn --version
 
 RUN git clone https://github.com/codinghumanity2347/Docker-shopping-cart.git
 
-RUN cd Docker-shopping-cart  && mvn clean install
+RUN cd Docker-shopping-cart &&  mvn clean install -Dmaven.test.skip=true
 
 RUN mkdir /usr/local/tomcat
 
-ADD http://www-eu.apache.org/dist/tomcat/tomcat-8/v8.5.53/bin/apache-tomcat-8.5.53.tar.gz /tmp/tomcat.tar.gz
+RUN  apt-get update && apt-get install -y curl
 
-RUN cd /tmp && tar xvfz tomcat.tar.gz
+CMD /bin/bash
 
-RUN cp -Rv /tmp/apache-tomcat-8.5.53/* /usr/local/tomcat/
+RUN curl -O https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.56/bin/apache-tomcat-8.5.56.zip 
+
+RUN cd /tmp && ls
+
+RUN apt-get install unzip -y
+
+RUN unzip  apache-tomcat-8.5.56.zip
+
+RUN ls
+
+RUN mv apache-tomcat-8.5.56 /tmp/apache-tomcat-8.5.56
+
+RUN cp -rf  /tmp/apache-tomcat-8.5.56/  /usr/local/tomcat
 
 EXPOSE 8080
 
-RUN cp /tmp/docker/Docker-shopping-cart/target/ShoppingKart-0.0.1-SNAPSHOT.jar  /usr/local/tomcat/webapps/ShoppingKart-0.0.1-SNAPSHOT.jar
+RUN ls /tmp/docker/Docker-shopping-cart/target
 
-CMD /usr/local/tomcat/bin/catalina.sh run
+RUN cp /tmp/docker/Docker-shopping-cart/target/ShoppingKart-0.0.1-SNAPSHOT.war  /usr/local/tomcat/apache-tomcat-8.5.56/webapps/
 
+RUN chmod -R 777 /usr/local/tomcat/apache-tomcat-8.5.56
+
+CMD  /usr/local/tomcat/apache-tomcat-8.5.56/bin/catalina.sh run
